@@ -8,6 +8,8 @@
 //------------------------------------------------------------------------------
 // definitions
 
+#define LED_UPDATE_INT 20                   // LED update interval [ms]
+
 
 //------------------------------------------------------------------------------
 // global variables
@@ -53,7 +55,7 @@ int main(void)
         updateLEDs();
 
         // wait a bit
-        _delay_ms(20);
+        _delay_ms(LED_UPDATE_INT);
     }
     return 0;
 }

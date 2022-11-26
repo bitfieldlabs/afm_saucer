@@ -2,6 +2,10 @@
 #include <avr/interrupt.h>
 
 
+// Code by josh.com
+// https://wp.josh.com/2014/05/13/ws2812-neopixels-are-not-so-finicky-once-you-get-to-know-them/
+
+
 //------------------------------------------------------------------------------
 // definitions
 
