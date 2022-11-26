@@ -2,14 +2,11 @@
 #include <avr/interrupt.h>
 #include <util/delay.h>
 #include <stdbool.h>
-#include "led.h"
+#include "modes.h"
 
 
 //------------------------------------------------------------------------------
 // definitions
-
-#define NUM_LEDS 16
-#define NUM_FLASHER 4
 
 
 //------------------------------------------------------------------------------
@@ -22,8 +19,6 @@ static volatile bool svFlashState = true;  // flasher status
 //------------------------------------------------------------------------------
 // declarations
 
-void updateLEDs();
-void updateFlasher();
 
 
 //------------------------------------------------------------------------------
@@ -35,25 +30,29 @@ int main(void)
     EIMSK |= (1 << INT0);                   // turn on INT0
     EICRA |= (1 << ISC10);                  // trigger INT1 on any edge
     EIMSK |= (1 << INT1);                   // turn on INT1
-    sei();
-
+    sei();                                  // enable interrupts
 
     // to infinity and beyond
     uint16_t lastLEDState = 0;
     bool lastFlashState = false;
     while(1)
     {
-        // update all LEDS upon change
+        // update the LED state upon change
         if (svLEDState != lastLEDState)
         {
-            updateLEDs();
+            updateLEDState(svLEDState);
             lastLEDState = svLEDState;
         }
         if (svFlashState != lastFlashState)
         {
-            updateFlasher();
+            updateFlasherState(svFlashState);
             lastFlashState = svFlashState;
         }
+
+        // update all LEDs
+        updateLEDs();
+
+        // wait a bit
         _delay_ms(20);
     }
     return 0;
@@ -74,42 +73,4 @@ ISR (INT0_vect)
 ISR (INT1_vect)
 {
     svFlashState = !svFlashState;
-}
-
-//------------------------------------------------------------------------------
-void updateLEDs()
-{
-    uint16_t state = svLEDState;
-    for (uint8_t i=0; i<NUM_LEDS; i++)
-    {
-        if (state & 0x01)
-        {
-            // LED off
-            sendPixel(0, 0, 0, true);
-        }
-        else
-        {
-            // LED on
-            sendPixel(0xaa, 0, 0, true);
-        }
-        state >>= 1;
-    }
-}
-
-//------------------------------------------------------------------------------
-void updateFlasher()
-{
-    for (uint8_t i=0; i<NUM_FLASHER; i++)
-    {
-        if (svFlashState)
-        {
-            // LED off
-            sendPixel(0, 0, 0, false);
-        }
-        else
-        {
-            // LED on
-            sendPixel(0xff, 0xff, 0xff, false);
-        }
-    }
 }
