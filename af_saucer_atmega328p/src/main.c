@@ -37,7 +37,7 @@ int main(void)
     // to infinity and beyond
     uint16_t lastLEDState = 0;
     bool lastFlashState = false;
-    while(1)
+    while (true)
     {
         // update the LED state upon change
         if (svLEDState != lastLEDState)
@@ -64,7 +64,10 @@ int main(void)
 ISR (INT0_vect)
 {
     // read data from PD4
-    uint8_t data = (PIND & 0b00010000);
+    //uint8_t data = (PIND & 0b00010000);
+    static bool sOn = true;
+    uint8_t data = (sOn) ? 0b00010000 : 0b00000000;
+    sOn = ! sOn;
 
     // shift new value into LED status
     svLEDState <<= 1;

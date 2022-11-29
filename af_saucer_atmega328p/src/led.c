@@ -169,8 +169,8 @@ void sendByte(uint8_t byte, bool firstString)
 //------------------------------------------------------------------------------
 void sendPixel(uint8_t r, uint8_t g, uint8_t b, bool firstString)
 {  
-    sendByte(g, firstString);          // Neopixel wants colors in green then red then blue order
     sendByte(r, firstString);
+    sendByte(g, firstString);
     sendByte(b, firstString);
 }
 

@@ -11,6 +11,8 @@
 
 #define MODE_IND_ACCUM_STEPS 8
 
+#define VSCALE 16       // HSV scale for LED modes
+
 // saucer LED modes
 typedef enum SAUCER_MODES_e 
 {
@@ -26,28 +28,105 @@ typedef enum SAUCER_MODES_e
     SM_NUM              // number of saucer modes
 } SAUCER_MODES_t;
 
+typedef struct LED_MODE_s
+{
+    uint16_t startH;    // start hue * VSCALE
+    uint16_t endH;      // end hue * VSCALE
+    uint16_t startV;    // start value * VSCALE
+    uint16_t endV;      // end value * VSCALE
+    int8_t speedH;      // hue animation speed
+    int8_t speedV;      // value animation speed
+    int8_t ofsH;        // per-LED hue offset
+    int8_t ofsV;        // per-LED value offset
+    uint8_t afterglow;  // LED afterglow [steps]
+} LED_MODE_t;
+
+typedef struct LED_MODE_VALUES_s
+{
+    uint16_t currH;     // current hue*VSCALE for first LED
+    uint16_t currV;     // current value*VSCALE for first LED
+    int8_t currSpeedH;  // current hue speed (signed)
+    int8_t currSpeedV;  // current value speed (signed)
+} LED_MODE_VALUES_t;
+
+static const LED_MODE_t skCMOff =
+{
+    .startH = 0*VSCALE,
+    .endH = 0*VSCALE,
+    .startV = 0*VSCALE,
+    .endV = 0*VSCALE,
+    .speedH = 0,
+    .speedV = 0,
+    .ofsH = 0,
+    .ofsV = 0,
+    .afterglow = 0
+};
+
+static const LED_MODE_t skCMRed =
+{
+    .startH = 0*VSCALE,
+    .endH = 8*VSCALE,
+    .startV = 255*VSCALE,
+    .endV = 255*VSCALE,
+    .speedH = 1,
+    .speedV = 0,
+    .ofsH = 0,
+    .ofsV = 0,
+    .afterglow = 4
+};
+
+static const LED_MODE_t skCMIdlePulse =
+{
+    .startH = 103*VSCALE,
+    .endH = 180*VSCALE,
+    .startV = 0*VSCALE,
+    .endV = 4*VSCALE,
+    .speedH = 1,
+    .speedV = 1,
+    .ofsH = 0,
+    .ofsV = 0,
+    .afterglow = 4
+};
+
 //------------------------------------------------------------------------------
 // global variables
 
-static uint16_t sLEDState = 0xffff;            // status for all 16 LEDs
+static uint16_t sLEDState = 0;                 // status for all 16 LEDs, 0 means LED off
 static bool sFlashState = true;                // flasher status
-static SAUCER_MODES_t sMode = SM_BOOT;          // auto detected saucer mode
-static uint8_t sModeIndicators[SM_NUM]= {0};     // accumulated saucer mode indicators
+static SAUCER_MODES_t sMode = SM_NUM;          // auto detected saucer mode
+static uint8_t sModeIndicators[SM_NUM]= {0};   // accumulated saucer mode indicators
+static LED_MODE_t sFGMode;                     // foreground color mode
+static LED_MODE_t sBGMode;                     // background color mode
+static LED_MODE_VALUES_t sFGModeValues[NUM_LEDS];        // current foreground mode values
+static LED_MODE_VALUES_t sBGModeValues[NUM_LEDS];        // current background mode values
+static uint8_t sLEDActive[NUM_LEDS] = { 0 };   // LED active status (afterglow counter)
+
+
+//------------------------------------------------------------------------------
+// declarations
+
+void setMode(SAUCER_MODES_t mode);
 
 
 //------------------------------------------------------------------------------
 void updateLEDState(uint16_t newState)
 {
-    sLEDState = newState;
+    sLEDState = ~newState;
+
+    // initialize the modes
+    if (sMode >= SM_NUM)
+    {
+        setMode(SM_BOOT);
+    }
 
     // try to detect the current mode
     SAUCER_MODES_t mode = SM_BOOT;
-    if (sLEDState == 0xffff)
+    if (sLEDState == 0x0000)
     {
         // all LEDs off
         mode = SM_GAMEIDLE;
     }
-    else if (sLEDState == 0x0000)
+    else if (sLEDState == 0xffff)
     {
         // boot up
         mode = SM_BOOT;
@@ -71,6 +150,7 @@ void updateLEDState(uint16_t newState)
     }
 
     // update all indicators
+    SAUCER_MODES_t newMode = sMode;
     for (uint8_t i=0; i<SM_NUM; i++)
     {
         if (i==mode)
@@ -86,10 +166,16 @@ void updateLEDState(uint16_t newState)
         }
 
         // set the mode to what is currently indicated the most
-        if (sModeIndicators[i] > sModeIndicators[sMode])
+        if (sModeIndicators[i] > sModeIndicators[newMode])
         {
-            sMode = i;
+            newMode = i;
         }
+    }
+
+    // switch mode if indicated
+    if (newMode != sMode)
+    {
+        setMode(newMode);
     }
 }
 
@@ -100,23 +186,64 @@ void updateFlasherState(bool newState)
 }
 
 //------------------------------------------------------------------------------
+void getColor(uint8_t pos, bool state, uint8_t *r, uint8_t *g, uint8_t *b)
+{
+    const LED_MODE_VALUES_t *mv = (state) ? &sFGModeValues[pos] : &sBGModeValues[pos];
+    hsv2rgb((mv->currH>>4), 255, (mv->currV>>4), r, g, b);
+}
+
+//------------------------------------------------------------------------------
+void nextValue(uint16_t *v, int8_t *inc, int16_t min, int16_t max)
+{
+    int16_t nv = ((int16_t)*v + *inc);
+    if (nv > max)
+    {
+        nv = max;
+        *inc = -(*inc);
+    }
+    else if (nv < min)
+    {
+        nv = min;
+        *inc = -(*inc);
+    }
+    *v = (uint16_t)nv;
+}
+
+//------------------------------------------------------------------------------
+void advanceMode(const LED_MODE_t *ledMode, LED_MODE_VALUES_t *ledModeValues)
+{
+    // advance for all LEDs
+    for (uint8_t i=0; i<NUM_LEDS; i++)
+    {
+        nextValue(&ledModeValues->currH, &ledModeValues->currSpeedH, ledMode->startH, ledMode->endH);
+        nextValue(&ledModeValues->currV, &ledModeValues->currSpeedV, ledMode->startV, ledMode->endV);
+        ledModeValues++;
+    }
+}
+
+//------------------------------------------------------------------------------
 void updateLEDs()
 {
-    // update the 16 edge LEDs
+    // advance the mode
+    advanceMode(&sFGMode, &sFGModeValues[0]);
+    advanceMode(&sBGMode, &sBGModeValues[0]);
+
+    uint8_t r[NUM_LEDS];
+    uint8_t g[NUM_LEDS];
+    uint8_t b[NUM_LEDS];
+
+    // prepare all LEDs
     uint16_t state = sLEDState;
     for (uint8_t i=0; i<NUM_LEDS; i++)
     {
-        if (state & 0x01)
-        {
-            // LED off
-            sendPixel(0, 0, 0, true);
-        }
-        else
-        {
-            // LED on
-            sendPixel(0xaa, 0, 0, true);
-        }
+        getColor(i, state&0x01, &r[i], &g[i], &b[i]);
         state >>= 1;
+    }
+
+    // now update all 16 LEDs
+    for (uint8_t i=0; i<NUM_LEDS; i++)
+    {
+        sendPixel(r[i], g[i], b[i], true);
     }
 
     // update the 4 flashers
@@ -133,4 +260,41 @@ void updateLEDs()
             sendPixel(0xff, 0xff, 0xff, false);
         }
     }
+}
+
+//------------------------------------------------------------------------------
+void initValues(const LED_MODE_t *ledMode, LED_MODE_VALUES_t *ledModeValues)
+{
+    int8_t ofsH = ledMode->ofsH;
+    int8_t ofsV = ledMode->ofsV;
+    uint16_t h = ledMode->startH;
+    uint16_t v = ledMode->startV;
+    for (uint8_t i=0; i<NUM_LEDS; i++)
+    {
+        ledModeValues->currH = h;
+        ledModeValues->currSpeedH = ((ofsH < 0) == (ledMode->ofsH < 0)) ? ledMode->speedH : -ledMode->speedH;
+        nextValue(&h, &ofsH, ledMode->startH, ledMode->endH);
+        ledModeValues->currV = v;
+        ledModeValues->currSpeedV = ((ofsV < 0) == (ledMode->ofsV < 0)) ? ledMode->speedV : -ledMode->speedV;
+        nextValue(&v, &ofsV, ledMode->startV, ledMode->endV);
+        ledModeValues++;
+    }
+}
+
+//------------------------------------------------------------------------------
+void setMode(SAUCER_MODES_t mode)
+{
+    // set the mode parameters
+    switch (mode)
+    {
+        //case SM_BOOT: sFGMode = skCMOff; sBGMode = skCMIdlePulse; break;
+        //case SM_ATTRACT: sFGMode = skCMRed; sBGMode = skCMIdlePulse; break;
+        default: sFGMode = skCMRed; sBGMode = skCMIdlePulse; break;
+    }
+
+    // apply mode to all LED values
+    initValues(&sFGMode, &sFGModeValues[0]);
+    initValues(&sBGMode, &sBGModeValues[0]);
+
+    sMode = mode;
 }
