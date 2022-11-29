@@ -72,7 +72,20 @@ static const LED_MODE_t skCMRed =
     .speedV = 0,
     .ofsH = 0,
     .ofsV = 0,
-    .afterglow = 4
+    .afterglow = 16
+};
+
+static const LED_MODE_t skCMBlue =
+{
+    .startH = 140*VSCALE,
+    .endH = 140*VSCALE,
+    .startV = 155*VSCALE,
+    .endV = 155*VSCALE,
+    .speedH = 0,
+    .speedV = 0,
+    .ofsH = 0,
+    .ofsV = 0,
+    .afterglow = 16
 };
 
 static const LED_MODE_t skCMIdlePulse =
@@ -186,10 +199,57 @@ void updateFlasherState(bool newState)
 }
 
 //------------------------------------------------------------------------------
-void getColor(uint8_t pos, bool state, uint8_t *r, uint8_t *g, uint8_t *b)
+void getColor(uint8_t pos, uint8_t agStep, uint8_t *r, uint8_t *g, uint8_t *b)
 {
-    const LED_MODE_VALUES_t *mv = (state) ? &sFGModeValues[pos] : &sBGModeValues[pos];
-    hsv2rgb((mv->currH>>4), 255, (mv->currV>>4), r, g, b);
+    /*
+    // use foreground mode for active LEDs and background for inactive ones
+    const LED_MODE_VALUES_t *mv = (agStep) ? &sFGModeValues[pos] : &sBGModeValues[pos];
+
+    // modify the brightness (v) with the afterglow step
+    uint16_t v;
+    if ((agStep > 0) && (agStep < sFGMode.afterglow))
+    {
+        v = (mv->currV * agStep / sFGMode.afterglow);
+    }
+    else
+    {
+        v = mv->currV;
+    }
+    v /= VSCALE;
+
+    // convert to rgb
+    hsv2rgb((mv->currH>>4), 255, v, r, g, b);
+    */
+
+    if (agStep)
+    {
+        if (agStep >= sFGMode.afterglow)
+        {
+            // full foreground color
+            const LED_MODE_VALUES_t *mv = &sFGModeValues[pos];
+            hsv2rgb((mv->currH>>4), 255, (mv->currV>>4), r, g, b);
+        }
+        else
+        {
+            // afterglow -> mix foreground and background color
+            uint8_t rf, gf, bf, rb, gb, bb;
+            const LED_MODE_VALUES_t *mv = &sFGModeValues[pos];
+            hsv2rgb((mv->currH>>4), 255, (mv->currV>>4), &rf, &gf, &bf);
+            mv = &sBGModeValues[pos];
+            hsv2rgb((mv->currH>>4), 255, (mv->currV>>4), &rb, &gb, &bb);
+
+            uint8_t ratio = (agStep * (256/sFGMode.afterglow));
+            *r = blend8(rb, rf, ratio);
+            *g = blend8(gb, gf, ratio);
+            *b = blend8(bb, bf, ratio);
+        }
+    }
+    else
+    {
+        // full background color
+        const LED_MODE_VALUES_t *mv = &sBGModeValues[pos];
+        hsv2rgb((mv->currH>>4), 255, (mv->currV>>4), r, g, b);
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -236,7 +296,21 @@ void updateLEDs()
     uint16_t state = sLEDState;
     for (uint8_t i=0; i<NUM_LEDS; i++)
     {
-        getColor(i, state&0x01, &r[i], &g[i], &b[i]);
+        // activate the LED for the afterglow duration
+        if (state & 0x01)
+        {
+            sLEDActive[i] = sFGMode.afterglow;
+        }
+        else
+        {
+            if (sLEDActive[i])
+            {
+                sLEDActive[i]--;
+            }
+        }
+
+        // determine the current LED color
+        getColor(i, sLEDActive[i], &r[i], &g[i], &b[i]);
         state >>= 1;
     }
 
@@ -289,7 +363,7 @@ void setMode(SAUCER_MODES_t mode)
     {
         //case SM_BOOT: sFGMode = skCMOff; sBGMode = skCMIdlePulse; break;
         //case SM_ATTRACT: sFGMode = skCMRed; sBGMode = skCMIdlePulse; break;
-        default: sFGMode = skCMRed; sBGMode = skCMIdlePulse; break;
+        default: sFGMode = skCMRed; sBGMode = skCMOff; break;
     }
 
     // apply mode to all LED values
