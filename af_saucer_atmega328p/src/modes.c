@@ -39,6 +39,8 @@ typedef struct LED_MODE_s
     int8_t ofsH;        // per-LED hue offset
     int8_t ofsV;        // per-LED value offset
     uint8_t afterglow;  // LED afterglow [steps]   ** CHOOSE A POWER OF 2 **
+    uint8_t animSpeed;  // animation frame delay
+    bool animDir;       // animation direction, true means clockwise
 } LED_MODE_t;
 
 typedef struct LED_MODE_VALUES_s
@@ -59,7 +61,9 @@ static const LED_MODE_t skCMOff =
     .speedV = 0,
     .ofsH = 0,
     .ofsV = 0,
-    .afterglow = 0
+    .afterglow = 0,
+    .animSpeed = 0,
+    .animDir = false
 };
 
 static const LED_MODE_t skCMRed =
@@ -72,7 +76,9 @@ static const LED_MODE_t skCMRed =
     .speedV = 0,
     .ofsH = 0,
     .ofsV = 0,
-    .afterglow = 8
+    .afterglow = 8,
+    .animSpeed = 0,
+    .animDir = false
 };
 
 static const LED_MODE_t skCMBlue =
@@ -85,7 +91,9 @@ static const LED_MODE_t skCMBlue =
     .speedV = 0,
     .ofsH = 0,
     .ofsV = 0,
-    .afterglow = 16
+    .afterglow = 8,
+    .animSpeed = 0,
+    .animDir = false
 };
 
 static const LED_MODE_t skCMIdlePulse =
@@ -94,11 +102,13 @@ static const LED_MODE_t skCMIdlePulse =
     .endH = 180*VSCALE,
     .startV = 0*VSCALE,
     .endV = 4*VSCALE,
-    .speedH = 1,
-    .speedV = 1,
-    .ofsH = 0,
-    .ofsV = 0,
-    .afterglow = 4
+    .speedH = 0,
+    .speedV = 0,
+    .ofsH = 4,
+    .ofsV = 4,
+    .afterglow = 4,
+    .animSpeed = 4,
+    .animDir = false
 };
 
 //------------------------------------------------------------------------------
@@ -113,6 +123,7 @@ static LED_MODE_t sBGMode;                     // background color mode
 static LED_MODE_VALUES_t sFGModeValues[NUM_LEDS];        // current foreground mode values
 static LED_MODE_VALUES_t sBGModeValues[NUM_LEDS];        // current background mode values
 static uint8_t sLEDActive[NUM_LEDS] = { 0 };   // LED active status (afterglow counter)
+static uint8_t sBGAnimCount = 0;               // background animation countdown
 
 
 //------------------------------------------------------------------------------
@@ -262,11 +273,48 @@ void advanceMode(const LED_MODE_t *ledMode, LED_MODE_VALUES_t *ledModeValues)
 }
 
 //------------------------------------------------------------------------------
+void rotateBGLEDs(bool dir)
+{
+    if (dir)
+    {
+        // rotate clockwise
+        LED_MODE_VALUES_t tmp = sBGModeValues[0];
+        for (uint8_t i=0; i<(NUM_LEDS-1); i++)
+        {
+            sBGModeValues[i] = sBGModeValues[i+1];
+        }
+        sBGModeValues[NUM_LEDS-1] = tmp;
+    }
+    else
+    {
+        // rotate counterclockwise
+        LED_MODE_VALUES_t tmp = sBGModeValues[NUM_LEDS-1];
+        for (uint8_t i=NUM_LEDS-1; i>0; i--)
+        {
+            sBGModeValues[i] = sBGModeValues[i-1];
+        }
+        sBGModeValues[0] = tmp;
+    }
+
+    // reset the animation counter
+    sBGAnimCount = sBGMode.animSpeed;
+}
+
+//------------------------------------------------------------------------------
 void updateLEDs()
 {
     // advance the mode
     advanceMode(&sFGMode, &sFGModeValues[0]);
     advanceMode(&sBGMode, &sBGModeValues[0]);
+    if (sBGMode.animSpeed)
+    {
+        sBGAnimCount--;
+        if (sBGAnimCount == 0)
+        {
+            // rotate the background LEDs
+            rotateBGLEDs(sBGMode.animDir);
+        }
+    }
 
     uint8_t r[NUM_LEDS];
     uint8_t g[NUM_LEDS];
@@ -341,14 +389,19 @@ void setMode(SAUCER_MODES_t mode)
     // set the mode parameters
     switch (mode)
     {
-        //case SM_BOOT: sFGMode = skCMOff; sBGMode = skCMIdlePulse; break;
-        //case SM_ATTRACT: sFGMode = skCMRed; sBGMode = skCMIdlePulse; break;
+        case SM_BOOT: sFGMode = skCMOff; sBGMode = skCMIdlePulse; break;
+        case SM_ATTRACT: sFGMode = skCMRed; sBGMode = skCMIdlePulse; break;
+        case SM_TEST: sFGMode = skCMBlue; sBGMode = skCMOff; break;
+        case SM_GAMEIDLE: sFGMode = skCMBlue; sBGMode = skCMIdlePulse; break;
         default: sFGMode = skCMRed; sBGMode = skCMOff; break;
     }
 
     // apply mode to all LED values
     initValues(&sFGMode, &sFGModeValues[0]);
     initValues(&sBGMode, &sBGModeValues[0]);
+
+    // initialize the animation counter
+    sBGAnimCount = sBGMode.animSpeed;
 
     sMode = mode;
 }
