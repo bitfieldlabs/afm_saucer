@@ -11,7 +11,7 @@
 
 #define MODE_IND_ACCUM_STEPS 8
 
-#define VSCALE 16       // HSV scale for LED modes
+#define VSCALE 16       // HSV scale for LED modes   ** CHOOSE A POWER OF 2 **
 
 // saucer LED modes
 typedef enum SAUCER_MODES_e 
@@ -38,7 +38,7 @@ typedef struct LED_MODE_s
     int8_t speedV;      // value animation speed
     int8_t ofsH;        // per-LED hue offset
     int8_t ofsV;        // per-LED value offset
-    uint8_t afterglow;  // LED afterglow [steps]
+    uint8_t afterglow;  // LED afterglow [steps]   ** CHOOSE A POWER OF 2 **
 } LED_MODE_t;
 
 typedef struct LED_MODE_VALUES_s
@@ -72,7 +72,7 @@ static const LED_MODE_t skCMRed =
     .speedV = 0,
     .ofsH = 0,
     .ofsV = 0,
-    .afterglow = 16
+    .afterglow = 8
 };
 
 static const LED_MODE_t skCMBlue =
@@ -201,26 +201,6 @@ void updateFlasherState(bool newState)
 //------------------------------------------------------------------------------
 void getColor(uint8_t pos, uint8_t agStep, uint8_t *r, uint8_t *g, uint8_t *b)
 {
-    /*
-    // use foreground mode for active LEDs and background for inactive ones
-    const LED_MODE_VALUES_t *mv = (agStep) ? &sFGModeValues[pos] : &sBGModeValues[pos];
-
-    // modify the brightness (v) with the afterglow step
-    uint16_t v;
-    if ((agStep > 0) && (agStep < sFGMode.afterglow))
-    {
-        v = (mv->currV * agStep / sFGMode.afterglow);
-    }
-    else
-    {
-        v = mv->currV;
-    }
-    v /= VSCALE;
-
-    // convert to rgb
-    hsv2rgb((mv->currH>>4), 255, v, r, g, b);
-    */
-
     if (agStep)
     {
         if (agStep >= sFGMode.afterglow)
