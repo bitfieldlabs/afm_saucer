@@ -9,7 +9,10 @@
 #define NUM_LEDS 16
 #define NUM_FLASHER 4
 
-#define MODE_IND_ACCUM_STEPS 8
+#define FLASH_DURATION 4                    // flasher duration [frames]
+#define SHAKER_DURATION 64                  // shaker duration [frames]
+
+#define MODE_IND_ACCUM_STEPS 64
 
 #define VSCALE 16       // HSV scale for LED modes   ** CHOOSE A POWER OF 2 **
 
@@ -81,13 +84,28 @@ static const LED_MODE_t skCMRed =
     .animDir = false
 };
 
+static const LED_MODE_t skCMShake =
+{
+    .startH = 0*VSCALE,
+    .endH = 255*VSCALE,
+    .startV = 255*VSCALE,
+    .endV = 255*VSCALE,
+    .speedH = 16,
+    .speedV = 0,
+    .ofsH = 0,
+    .ofsV = 0,
+    .afterglow = 16,
+    .animSpeed = 0,
+    .animDir = false
+};
+
 static const LED_MODE_t skCMBlue =
 {
     .startH = 140*VSCALE,
-    .endH = 140*VSCALE,
+    .endH = 170*VSCALE,
     .startV = 155*VSCALE,
     .endV = 155*VSCALE,
-    .speedH = 0,
+    .speedH = 2,
     .speedV = 0,
     .ofsH = 0,
     .ofsV = 0,
@@ -115,7 +133,8 @@ static const LED_MODE_t skCMIdlePulse =
 // global variables
 
 static uint16_t sLEDState = 0;                 // status for all 16 LEDs, 0 means LED off
-static bool sFlashState = true;                // flasher status
+static uint8_t sFlashState = 0;                // flasher countdown [frames]
+static uint8_t sShakerState = 0;               // shaker countdown [frames]
 static SAUCER_MODES_t sMode = SM_NUM;          // auto detected saucer mode
 static uint8_t sModeIndicators[SM_NUM]= {0};   // accumulated saucer mode indicators
 static LED_MODE_t sFGMode;                     // foreground color mode
@@ -204,10 +223,17 @@ void updateLEDState(uint16_t newState)
 }
 
 //------------------------------------------------------------------------------
-void updateFlasherState(bool newState)
+void triggerFlasher()
 {
-    sFlashState = newState;
+    sFlashState = FLASH_DURATION;
 }
+
+//------------------------------------------------------------------------------
+void triggerShaker()
+{
+    sShakerState = SHAKER_DURATION;
+}
+
 
 //------------------------------------------------------------------------------
 void getColor(uint8_t pos, uint8_t agStep, uint8_t *r, uint8_t *g, uint8_t *b)
@@ -351,7 +377,12 @@ void updateLEDs()
     // update the 4 flashers
     for (uint8_t i=0; i<NUM_FLASHER; i++)
     {
-        if (sFlashState)
+        if (sShakerState)
+        {
+            // LED on
+            sendPixel(0x00, 0x00, 0xff, false);
+        }
+        else if (!sFlashState)
         {
             // LED off
             sendPixel(0, 0, 0, false);
@@ -361,6 +392,14 @@ void updateLEDs()
             // LED on
             sendPixel(0xff, 0xff, 0xff, false);
         }
+    }
+    if (sFlashState)
+    {
+        sFlashState--;
+    }
+    if (sShakerState)
+    {
+        sShakerState--;
     }
 }
 

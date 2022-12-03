@@ -2,6 +2,7 @@
 #include <stdbool.h>
 
 void updateLEDState(uint16_t newState);
-void updateFlasherState(bool newState);
+void triggerFlasher();
+void triggerShaker();
 void updateLEDs();
 void updateFlasher();
