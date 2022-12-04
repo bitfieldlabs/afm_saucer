@@ -7,7 +7,7 @@ As a bonus you get nice RGB colors!
 
 ![mounted pcb](https://github.com/bitfieldlabs/afm_saucer/blob/master/pictures/pcb_mounted.JPG)
 
-See a video of the saucer in action: https://vimeo.com/user77485343
+See a video of the saucer in action: [https://vimeo.com/user77485343](https://vimeo.com/manage/videos/777834938)
 
 ## Required Components
 ![components](https://github.com/bitfieldlabs/afm_saucer/blob/master/pictures/components.jpg)
