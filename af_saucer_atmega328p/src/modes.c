@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include "modes.h"
 #include "led.h"
 #include "utils.h"
@@ -37,10 +38,10 @@ typedef struct LED_MODE_s
     uint16_t endH;      // end hue * VSCALE
     uint16_t startV;    // start value * VSCALE
     uint16_t endV;      // end value * VSCALE
-    int8_t speedH;      // hue animation speed
-    int8_t speedV;      // value animation speed
-    int8_t ofsH;        // per-LED hue offset
-    int8_t ofsV;        // per-LED value offset
+    int16_t speedH;     // hue animation speed * VSCALE
+    int16_t speedV;     // value animation speed * VSCALE
+    int16_t ofsH;       // per-LED hue offset * VSCALE
+    int16_t ofsV;       // per-LED value offset * VSCALE
     uint8_t afterglow;  // LED afterglow [steps]   ** CHOOSE A POWER OF 2 **
     uint8_t animSpeed;  // animation frame delay
     bool animDir;       // animation direction, true means clockwise
@@ -50,8 +51,8 @@ typedef struct LED_MODE_VALUES_s
 {
     uint16_t currH;     // current hue*VSCALE for first LED
     uint16_t currV;     // current value*VSCALE for first LED
-    int8_t currSpeedH;  // current hue speed (signed)
-    int8_t currSpeedV;  // current value speed (signed)
+    int16_t currSpeedH; // current hue speed (signed)
+    int16_t currSpeedV; // current value speed (signed)
 } LED_MODE_VALUES_t;
 
 static const LED_MODE_t skCMOff =
@@ -72,7 +73,7 @@ static const LED_MODE_t skCMOff =
 static const LED_MODE_t skCMRed =
 {
     .startH = 0*VSCALE,
-    .endH = 8*VSCALE,
+    .endH = 16*VSCALE,
     .startV = 255*VSCALE,
     .endV = 255*VSCALE,
     .speedH = 1,
@@ -80,21 +81,6 @@ static const LED_MODE_t skCMRed =
     .ofsH = 0,
     .ofsV = 0,
     .afterglow = 8,
-    .animSpeed = 0,
-    .animDir = false
-};
-
-static const LED_MODE_t skCMShake =
-{
-    .startH = 0*VSCALE,
-    .endH = 255*VSCALE,
-    .startV = 255*VSCALE,
-    .endV = 255*VSCALE,
-    .speedH = 16,
-    .speedV = 0,
-    .ofsH = 0,
-    .ofsV = 0,
-    .afterglow = 16,
     .animSpeed = 0,
     .animDir = false
 };
@@ -108,6 +94,21 @@ static const LED_MODE_t skCMBlue =
     .speedH = 2,
     .speedV = 0,
     .ofsH = 0,
+    .ofsV = 0,
+    .afterglow = 8,
+    .animSpeed = 0,
+    .animDir = false
+};
+
+static const LED_MODE_t skCMTest =
+{
+    .startH = 0*VSCALE,
+    .endH = 255*VSCALE,
+    .startV = 155*VSCALE,
+    .endV = 155*VSCALE,
+    .speedH = 2,
+    .speedV = 0,
+    .ofsH = 16*VSCALE,
     .ofsV = 0,
     .afterglow = 8,
     .animSpeed = 0,
@@ -159,6 +160,7 @@ void updateLEDState(uint16_t newState)
     // initialize the modes
     if (sMode >= SM_NUM)
     {
+        srand(ADC);
         setMode(SM_BOOT);
     }
 
@@ -243,7 +245,15 @@ void getColor(uint8_t pos, uint8_t agStep, uint8_t *r, uint8_t *g, uint8_t *b)
         if (agStep >= sFGMode.afterglow)
         {
             // full foreground color
-            const LED_MODE_VALUES_t *mv = &sFGModeValues[pos];
+            LED_MODE_VALUES_t *mv = &sFGModeValues[pos];
+
+            // randomly add sparkles when shaken
+            if (sShakerState && ((rand() % 4) == 0))
+            {
+                mv->currH = ((uint8_t)rand() << 4);
+                mv->currV = 255*VSCALE;
+            }
+
             hsv2rgb((mv->currH>>4), 255, (mv->currV>>4), r, g, b);
         }
         else
@@ -270,7 +280,7 @@ void getColor(uint8_t pos, uint8_t agStep, uint8_t *r, uint8_t *g, uint8_t *b)
 }
 
 //------------------------------------------------------------------------------
-void nextValue(uint16_t *v, int8_t *inc, int16_t min, int16_t max)
+void nextValue(uint16_t *v, int16_t *inc, int16_t min, int16_t max)
 {
     int16_t nv = ((int16_t)*v + *inc);
     if (nv > max)
@@ -377,12 +387,7 @@ void updateLEDs()
     // update the 4 flashers
     for (uint8_t i=0; i<NUM_FLASHER; i++)
     {
-        if (sShakerState)
-        {
-            // LED on
-            sendPixel(0x00, 0x00, 0xff, false);
-        }
-        else if (!sFlashState)
+        if (!sFlashState)
         {
             // LED off
             sendPixel(0, 0, 0, false);
@@ -406,8 +411,8 @@ void updateLEDs()
 //------------------------------------------------------------------------------
 void initValues(const LED_MODE_t *ledMode, LED_MODE_VALUES_t *ledModeValues)
 {
-    int8_t ofsH = ledMode->ofsH;
-    int8_t ofsV = ledMode->ofsV;
+    int16_t ofsH = ledMode->ofsH;
+    int16_t ofsV = ledMode->ofsV;
     uint16_t h = ledMode->startH;
     uint16_t v = ledMode->startV;
     for (uint8_t i=0; i<NUM_LEDS; i++)
@@ -430,7 +435,7 @@ void setMode(SAUCER_MODES_t mode)
     {
         case SM_BOOT: sFGMode = skCMOff; sBGMode = skCMIdlePulse; break;
         case SM_ATTRACT: sFGMode = skCMRed; sBGMode = skCMIdlePulse; break;
-        case SM_TEST: sFGMode = skCMBlue; sBGMode = skCMOff; break;
+        case SM_TEST: sFGMode = skCMTest; sBGMode = skCMOff; break;
         case SM_GAMEIDLE: sFGMode = skCMBlue; sBGMode = skCMIdlePulse; break;
         default: sFGMode = skCMRed; sBGMode = skCMOff; break;
     }
