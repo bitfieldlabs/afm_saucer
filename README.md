@@ -5,5 +5,7 @@ No additional components or connections required!
 
 As a bonus you get nice RGB colors!
 
+![mounted pcb](https://github.com/bitfieldlabs/afm_saucer/blob/master/pictures/pcb_mounted.jpg)
+
 ## Required Components
 ![components](https://github.com/bitfieldlabs/afm_saucer/blob/master/pictures/components.jpg)
