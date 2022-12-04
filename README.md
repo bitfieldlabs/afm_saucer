@@ -5,4 +5,5 @@ No additional components or connections required!
 
 As a bonus you get nice RGB colors!
 
-!(components)[https://github.com/bitfieldlabs/afm_saucer/blob/master/pictures/components.jpg]
+Here are the required components:
+![components](https://github.com/bitfieldlabs/afm_saucer/blob/master/pictures/components.jpg)
