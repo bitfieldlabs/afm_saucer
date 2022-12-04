@@ -148,7 +148,7 @@ static const LED_MODE_t skCMIdlePulse =
 static const LED_MODE_t skCMAttack1 =
 {
     .startH = 230*VSCALE,
-    .endH = 255*VSC ALE,
+    .endH = 255*VSCALE,
     .startV = 255*VSCALE,
     .endV = 255*VSCALE,
     .speedH = 4,
