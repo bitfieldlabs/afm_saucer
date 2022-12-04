@@ -70,6 +70,21 @@ static const LED_MODE_t skCMOff =
     .animDir = false
 };
 
+static const LED_MODE_t skCMBoot =
+{
+    .startH = 40*VSCALE,
+    .endH = 52*VSCALE,
+    .startV = 0*VSCALE,
+    .endV = 16*VSCALE,
+    .speedH = 1,
+    .speedV = 2,
+    .ofsH = 0,
+    .ofsV = 0,
+    .afterglow = 0,
+    .animSpeed = 0,
+    .animDir = false
+};
+
 static const LED_MODE_t skCMRed =
 {
     .startH = 0*VSCALE,
@@ -85,17 +100,17 @@ static const LED_MODE_t skCMRed =
     .animDir = false
 };
 
-static const LED_MODE_t skCMBlue =
+static const LED_MODE_t skCMHits =
 {
-    .startH = 140*VSCALE,
-    .endH = 170*VSCALE,
-    .startV = 155*VSCALE,
-    .endV = 155*VSCALE,
-    .speedH = 2,
+    .startH = 2*VSCALE,
+    .endH = 24*VSCALE,
+    .startV = 222*VSCALE,
+    .endV = 222*VSCALE,
+    .speedH = 1,
     .speedV = 0,
-    .ofsH = 0,
+    .ofsH = 2,
     .ofsV = 0,
-    .afterglow = 8,
+    .afterglow = 16,
     .animSpeed = 0,
     .animDir = false
 };
@@ -129,6 +144,22 @@ static const LED_MODE_t skCMIdlePulse =
     .animSpeed = 4,
     .animDir = false
 };
+
+static const LED_MODE_t skCMAttack1 =
+{
+    .startH = 230*VSCALE,
+    .endH = 255*VSC ALE,
+    .startV = 255*VSCALE,
+    .endV = 255*VSCALE,
+    .speedH = 4,
+    .speedV = 0,
+    .ofsH = 4,
+    .ofsV = 0,
+    .afterglow = 1,
+    .animSpeed = 0,
+    .animDir = false
+};
+
 
 //------------------------------------------------------------------------------
 // global variables
@@ -168,15 +199,17 @@ void updateLEDState(uint16_t newState)
     SAUCER_MODES_t mode = SM_BOOT;
     if (sLEDState == 0x0000)
     {
-        // all LEDs off
+        // game started, UFO idle
         mode = SM_GAMEIDLE;
+
     }
     else if (sLEDState == 0xffff)
     {
         // boot up
         mode = SM_BOOT;
     }
-    else if ((sLEDState == 0xaaaa) || (sLEDState == 0x5555))
+    else if ((sLEDState == 0xcccc) || (sLEDState == 0x3333) ||
+             (sLEDState == 0x6666) || (sLEDState == 0x9999))
     {
         // attract mode
         mode = SM_ATTRACT;
@@ -395,7 +428,8 @@ void updateLEDs()
         else
         {
             // LED on
-            sendPixel(0xff, 0xff, 0xff, false);
+            //sendPixel(0xff, 0xff, 0xff, false);
+            sendPixel(174, 255, 171, false);
         }
     }
     if (sFlashState)
@@ -433,10 +467,11 @@ void setMode(SAUCER_MODES_t mode)
     // set the mode parameters
     switch (mode)
     {
-        case SM_BOOT: sFGMode = skCMOff; sBGMode = skCMIdlePulse; break;
+        case SM_BOOT: sFGMode = skCMOff; sBGMode = skCMBoot; break;
         case SM_ATTRACT: sFGMode = skCMRed; sBGMode = skCMIdlePulse; break;
         case SM_TEST: sFGMode = skCMTest; sBGMode = skCMOff; break;
-        case SM_GAMEIDLE: sFGMode = skCMBlue; sBGMode = skCMIdlePulse; break;
+        case SM_GAMEIDLE: sFGMode = skCMHits; sBGMode = skCMIdlePulse; break;
+        case SM_ATTACK1: sFGMode = skCMAttack1; sBGMode = skCMOff; break;
         default: sFGMode = skCMRed; sBGMode = skCMOff; break;
     }
 
