@@ -1,0 +1,15 @@
+C1,100uF,Capacitor Axial L21.0mm D8.0mm P28.00mm,https://www.mouser.ch/ProductDetail/598-477TTA025M
+"C2, C3",22pF,Capacitor Disc D7.5mm W5.0mm P7.50mm,https://www.mouser.ch/ProductDetail/810-CC45SL3JD220JYNA
+D1-D20,APA-106-F5,LED D5.0mm RGB,https://www.aliexpress.com/item/32945500333.html?spm=a2g0o.order_list.order_list_main.17.74d11802F9sa7f
+J1,Conn_01x08_Male,PinHeader 1x08 P2.54mm 90deg,https://www.mouser.ch/ProductDetail/538-22-05-7088
+J2,Conn_01x02_Male,PinHeader 1x02_P2.54mm Vertical,
+J3,Conn_02x03_Odd_Even,PinHeader 2x03 P2.54mm Vertical,
+R1,10k,Resistor R_Axial L6.3mm D2.5mm P10.16mm,
+"R2, R3, R4, R5",1k,Resistor R_Axial L6.3mm D2.5mm P10.16mm,
+"R6, R7",220,Resistor R_Axial L6.3mm D2.5mm P10.16mm,
+SW1,Vibration Sensor,Vibration Sensor Medium/Fast,https://www.mouser.ch/ProductDetail/485-2384
+SW2,SW_Push,Push Button 6mm H9.5mm,
+SW3,SW_DIP_x04,DIP  Switch x04 W7.62mm P2.54mm,
+U1,OKI-78SR-5_1.5-W36-C,Converter DCDC_Murata OKI-78SR Horizontal,https://www.mouser.ch/ProductDetail/946-MEZD71202A-G
+U2,ATmega328P-P,DIP-28 W7.62mm,
+Y1,Crystal,Crystal 2Pin W10.0mm H5.0mm,https://www.mouser.ch/ProductDetail/449-LFXTAL027945BULK
