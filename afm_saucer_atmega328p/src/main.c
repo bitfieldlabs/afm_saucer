@@ -24,6 +24,8 @@ int main(void)
 {
     // setup
     DDRD = 0b01100010;                      // all inputs except pins PD1, PD5, PD6
+    DDRC = 0b00000000;                      // config DIPs on PC0-PC3
+    PORTC |= 0b00001111;                    // enable DIP switch pullups
     EICRA |= (1 << ISC00) | (1 << ISC01);   // trigger INT0 on rising edge
     EIMSK |= (1 << INT0);                   // turn on INT0
     EICRA |= (1 << ISC11);                  // trigger INT1 on falling edge
@@ -33,15 +35,10 @@ int main(void)
     sei();                                  // enable interrupts
 
     // to infinity and beyond
-    uint16_t lastLEDState = 0;
     while (true)
     {
         // update the LED state upon change
-        //if (svLEDState != lastLEDState)
-        {
-            updateLEDState(svLEDState);
-            lastLEDState = svLEDState;
-        }
+        updateLEDState(svLEDState);
         if (svFlashState)
         {
             triggerFlasher();
