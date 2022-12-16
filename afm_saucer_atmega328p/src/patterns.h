@@ -1,3 +1,37 @@
+/***********************************************************************
+ *    _   _   _             _     __                                           
+ *   /_\ | |_| |_ __ _  ___| | __/ _|_ __ ___  _ __ ___   /\/\   __ _ _ __ ___ 
+ *  //_\\| __| __/ _` |/ __| |/ / |_| '__/ _ \| '_ ` _ \ /    \ / _` | '__/ __|
+ * /  _  \ |_| || (_| | (__|   <|  _| | | (_) | | | | | / /\/\ \ (_| | |  \__ \
+ * \_/ \_/\__|\__\__,_|\___|_|\_\_| |_|  \___/|_| |_| |_\/    \/\__,_|_|  |___/
+ *
+ *                              ____ ____ ___ 
+ *                              |--< |__, |==]
+ *
+ *                      ____ ____ _  _ ____ ____ ____
+ *                      ==== |--| |__| |___ |=== |--<
+ *
+ *  Copyright (c) 2022 bitfield labs
+ * 
+ ***********************************************************************
+ *  This file is part of the Attack from Mars! RGB saucer project:
+ *  https://github.com/bitfieldlabs/afm_saucer
+ *
+ *  The AfM RGB saucer is free software: you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public License as
+ *  published by the Free Software Foundation, either version 3 of the
+ *  License, or (at your option) any later version.
+ *
+ *  AfM RGB saucer is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with afterglow.
+ *  If not, see <http://www.gnu.org/licenses/>.
+ ***********************************************************************/
+
 #include <avr/io.h>
 
 #define VSCALE 16       // HSV scale for LED modes   ** CHOOSE A POWER OF 2 **
@@ -29,6 +63,7 @@ typedef struct LED_MODE_s
     int16_t ofsV;       // per-LED value offset * VSCALE
     uint8_t afterglow;  // LED afterglow [steps]   ** CHOOSE A POWER OF 2 **
     uint8_t animSpeed;  // animation frame delay
+    uint8_t blinkInt;   // blinking interval [2^n frames], only applied for background patterns!
     bool animDir;       // animation direction, true means clockwise
 } LED_MODE_t;
 
@@ -59,6 +94,7 @@ static const LED_MODE_t skCMOff =
     .ofsV = 0,
     .afterglow = 0,
     .animSpeed = 0,
+    .blinkInt = 0,
     .animDir = false
 };
 
@@ -74,6 +110,7 @@ static const LED_MODE_t skCMBoot =
     .ofsV = 0,
     .afterglow = 0,
     .animSpeed = 0,
+    .blinkInt = 0,
     .animDir = false
 };
 
@@ -89,6 +126,7 @@ static const LED_MODE_t skCMRed =
     .ofsV = 0,
     .afterglow = 8,
     .animSpeed = 0,
+    .blinkInt = 0,
     .animDir = false
 };
 
@@ -104,6 +142,7 @@ static const LED_MODE_t skCMBrightRedOrange =
     .ofsV = 0,
     .afterglow = 16,
     .animSpeed = 0,
+    .blinkInt = 0,
     .animDir = false
 };
 
@@ -119,6 +158,7 @@ static const LED_MODE_t skCMRainbow =
     .ofsV = 0,
     .afterglow = 8,
     .animSpeed = 0,
+    .blinkInt = 0,
     .animDir = false
 };
 
@@ -134,6 +174,7 @@ static const LED_MODE_t skCMTealPulse =
     .ofsV = 4,
     .afterglow = 4,
     .animSpeed = 4,
+    .blinkInt = 0,
     .animDir = false
 };
 
@@ -149,6 +190,23 @@ static const LED_MODE_t skCMYellowPulse =
     .ofsV = 4,
     .afterglow = 4,
     .animSpeed = 4,
+    .blinkInt = 0,
+    .animDir = false
+};
+
+static const LED_MODE_t skCMYellowBlink =
+{
+    .startH = 30*VSCALE,
+    .endH = 38*VSCALE,
+    .startV = 0*VSCALE,
+    .endV = 6*VSCALE,
+    .speedH = 0,
+    .speedV = 0,
+    .ofsH = 2,
+    .ofsV = 4,
+    .afterglow = 4,
+    .animSpeed = 0,
+    .blinkInt = 8,  // 2^8
     .animDir = false
 };
 
@@ -164,6 +222,7 @@ static const LED_MODE_t skCMBrightPinkRed =
     .ofsV = 0,
     .afterglow = 2,
     .animSpeed = 0,
+    .blinkInt = 0,
     .animDir = false
 };
 
@@ -179,6 +238,7 @@ static const LED_MODE_t skCMBrightLightBlue =
     .ofsV = 0,
     .afterglow = 2,
     .animSpeed = 0,
+    .blinkInt = 0,
     .animDir = false
 };
 
@@ -207,9 +267,9 @@ static const COLOR_PATTERNS_t skColorPatterns[NUM_COLOR_PATTERN] =
     // COLOR PATTERN 2
     {
         // foreground modes
-        { &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed },
+        { &skCMOff, &skCMRed, &skCMBrightRedOrange, &skCMBrightLightBlue, &skCMBrightLightBlue, &skCMBrightLightBlue, &skCMBrightLightBlue, &skCMRainbow },
         // background modes
-        { &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff }
+        { &skCMBoot, &skCMYellowBlink, &skCMYellowBlink, &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff }
     },
 
     // COLOR PATTERN 3
