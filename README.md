@@ -13,3 +13,11 @@ See a video of the saucer in action: https://vimeo.com/777834938
 ![components](https://github.com/bitfieldlabs/afm_saucer/blob/master/pictures/components.jpg)
 
 The BOM is [here](https://github.com/bitfieldlabs/afm_saucer/blob/master/afm_saucer_pcb/afm_saucer/afm_saucer_bom.csv).
+ 
+## Programming the Atmega328p
+
+### Fuses
+The Atmega's fuses must be set to following values:
+ * hfuse: 0xDA
+ * efuse: 0xFD
+ * lfuse: 0xFF
