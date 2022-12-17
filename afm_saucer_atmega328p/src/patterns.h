@@ -194,19 +194,35 @@ static const LED_MODE_t skCMYellowPulse =
     .animDir = false
 };
 
-static const LED_MODE_t skCMYellowBlink =
+static const LED_MODE_t skCMRainbowPulse =
 {
-    .startH = 30*VSCALE,
-    .endH = 38*VSCALE,
+    .startH = 0*VSCALE,
+    .endH = 255*VSCALE,
     .startV = 0*VSCALE,
     .endV = 6*VSCALE,
-    .speedH = 0,
+    .speedH = 2,
     .speedV = 0,
     .ofsH = 2,
     .ofsV = 4,
     .afterglow = 4,
+    .animSpeed = 4,
+    .blinkInt = 0,
+    .animDir = false
+};
+
+static const LED_MODE_t skCMYellowBlink =
+{
+    .startH = 30*VSCALE,
+    .endH = 38*VSCALE,
+    .startV = 10*VSCALE,
+    .endV = 10*VSCALE,
+    .speedH = 0,
+    .speedV = 0,
+    .ofsH = 0,
+    .ofsV = 0,
+    .afterglow = 4,
     .animSpeed = 0,
-    .blinkInt = 8,  // 2^8
+    .blinkInt = 4,  // 2^8
     .animDir = false
 };
 
@@ -261,7 +277,7 @@ static const COLOR_PATTERNS_t skColorPatterns[NUM_COLOR_PATTERN] =
         // foreground modes
         { &skCMOff, &skCMRed, &skCMBrightRedOrange, &skCMBrightLightBlue, &skCMBrightLightBlue, &skCMBrightLightBlue, &skCMBrightLightBlue, &skCMRainbow },
         // background modes
-        { &skCMBoot, &skCMYellowPulse, &skCMYellowPulse, &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff }
+        { &skCMBoot, &skCMRainbowPulse, &skCMRainbowPulse, &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff }
     },
 
     // COLOR PATTERN 2
