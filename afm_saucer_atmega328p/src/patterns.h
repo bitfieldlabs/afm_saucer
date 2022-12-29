@@ -42,9 +42,7 @@ typedef enum SAUCER_MODES_e
     SM_BOOT = 0,        // boot up sequence, all LEDs on
     SM_ATTRACT,         // attract mode, alternating blinking pattern
     SM_GAMEIDLE,        // game mode, saucer idle, all LEDs off
-    SM_ATTACK1,         // game mode, saucer attack, part 1
-    SM_ATTACK2,         // game mode, saucer attack, part 2
-    SM_ATTACK3,         // game mode, saucer attack, part 3
+    SM_ATTACK,          // game mode, saucer attack
     SM_DESTROYED,       // game mode, saucer destroyed
     SM_TEST,            // saucer test mode, on LED at a time, starting with D16
 
@@ -130,6 +128,54 @@ static const LED_MODE_t skCMRed =
     .animDir = false
 };
 
+static const LED_MODE_t skCMGreen =
+{
+    .startH = 82*VSCALE,
+    .endH = 86*VSCALE,
+    .startV = 255*VSCALE,
+    .endV = 255*VSCALE,
+    .speedH = 1,
+    .speedV = 0,
+    .ofsH = 0,
+    .ofsV = 0,
+    .afterglow = 8,
+    .animSpeed = 0,
+    .blinkInt = 0,
+    .animDir = false
+};
+
+static const LED_MODE_t skCMBlue =
+{
+    .startH = 160*VSCALE,
+    .endH = 166*VSCALE,
+    .startV = 255*VSCALE,
+    .endV = 255*VSCALE,
+    .speedH = 1,
+    .speedV = 0,
+    .ofsH = 0,
+    .ofsV = 0,
+    .afterglow = 8,
+    .animSpeed = 0,
+    .blinkInt = 0,
+    .animDir = false
+};
+
+static const LED_MODE_t skCMRedOrig =
+{
+    .startH = 1*VSCALE,
+    .endH = 1*VSCALE,
+    .startV = 255*VSCALE,
+    .endV = 255*VSCALE,
+    .speedH = 0,
+    .speedV = 0,
+    .ofsH = 0,
+    .ofsV = 0,
+    .afterglow = 0,
+    .animSpeed = 0,
+    .blinkInt = 0,
+    .animDir = false
+};
+
 static const LED_MODE_t skCMBrightRedOrange =
 {
     .startH = 2*VSCALE,
@@ -190,6 +236,70 @@ static const LED_MODE_t skCMYellowPulse =
     .ofsV = 4,
     .afterglow = 4,
     .animSpeed = 4,
+    .blinkInt = 0,
+    .animDir = false
+};
+
+static const LED_MODE_t skCMBlueBreathe =
+{
+    .startH = 153*VSCALE,
+    .endH = 170*VSCALE,
+    .startV = 0*VSCALE,
+    .endV = 14*VSCALE,
+    .speedH = 1,
+    .speedV = 1,
+    .ofsH = 0,
+    .ofsV = 0,
+    .afterglow = 4,
+    .animSpeed = 0,
+    .blinkInt = 0,
+    .animDir = false
+};
+
+static const LED_MODE_t skCMGreenBreathe =
+{
+    .startH = 78*VSCALE,
+    .endH = 84*VSCALE,
+    .startV = 0*VSCALE,
+    .endV = 14*VSCALE,
+    .speedH = 1,
+    .speedV = 1,
+    .ofsH = 0,
+    .ofsV = 0,
+    .afterglow = 4,
+    .animSpeed = 0,
+    .blinkInt = 0,
+    .animDir = false
+};
+
+static const LED_MODE_t skCMRedGreenBreathe =
+{
+    .startH = 2*VSCALE,
+    .endH = 82*VSCALE,
+    .startV = 4*VSCALE,
+    .endV = 24*VSCALE,
+    .speedH = 1,
+    .speedV = 8,
+    .ofsH = 80,
+    .ofsV = 0,
+    .afterglow = 4,
+    .animSpeed = 0,
+    .blinkInt = 0,
+    .animDir = false
+};
+
+static const LED_MODE_t skCMRedGreenPulse =
+{
+    .startH = 2*VSCALE,
+    .endH = 182*VSCALE,
+    .startV = 0*VSCALE,
+    .endV = 24*VSCALE,
+    .speedH = 1,
+    .speedV = 24,
+    .ofsH = 80,
+    .ofsV = 24,
+    .afterglow = 8,
+    .animSpeed = 8,
     .blinkInt = 0,
     .animDir = false
 };
@@ -262,133 +372,133 @@ static const LED_MODE_t skCMBrightLightBlue =
 #define NUM_COLOR_PATTERN 16
 static const COLOR_PATTERNS_t skColorPatterns[NUM_COLOR_PATTERN] =
 {
-    // SM_BOOT, SM_ATTRACT, SM_GAMEIDLE, SM_ATTACK1, SM_ATTACK2, SM_ATTACK3, SM_DESTROYED, SM_TEST
+    // SM_BOOT, SM_ATTRACT, SM_GAMEIDLE, SM_ATTACK, SM_TEST
 
     // COLOR PATTERN 0
     {
         // foreground modes
-        { &skCMOff, &skCMRed, &skCMBrightRedOrange, &skCMBrightPinkRed, &skCMBrightPinkRed, &skCMBrightPinkRed, &skCMBrightPinkRed, &skCMRainbow },
+        { &skCMOff, &skCMRed, &skCMBrightRedOrange, &skCMBrightPinkRed, &skCMRainbow },
         // background modes
-        { &skCMBoot, &skCMTealPulse, &skCMTealPulse, &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff }
+        { &skCMBoot, &skCMTealPulse, &skCMTealPulse, &skCMOff, &skCMOff }
     },
 
     // COLOR PATTERN 1
     {
         // foreground modes
-        { &skCMOff, &skCMRed, &skCMBrightRedOrange, &skCMBrightLightBlue, &skCMBrightLightBlue, &skCMBrightLightBlue, &skCMBrightLightBlue, &skCMRainbow },
+        { &skCMOff, &skCMRed, &skCMBrightRedOrange, &skCMBrightLightBlue, &skCMRainbow },
         // background modes
-        { &skCMBoot, &skCMRainbowPulse, &skCMRainbowPulse, &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff }
+        { &skCMBoot, &skCMRainbowPulse, &skCMRainbowPulse, &skCMOff, &skCMOff }
     },
 
     // COLOR PATTERN 2
     {
         // foreground modes
-        { &skCMOff, &skCMRed, &skCMBrightRedOrange, &skCMBrightLightBlue, &skCMBrightLightBlue, &skCMBrightLightBlue, &skCMBrightLightBlue, &skCMRainbow },
+        { &skCMOff, &skCMRed, &skCMBrightRedOrange, &skCMBrightLightBlue, &skCMRainbow },
         // background modes
-        { &skCMBoot, &skCMYellowBlink, &skCMYellowBlink, &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff }
+        { &skCMBoot, &skCMYellowBlink, &skCMYellowBlink, &skCMOff, &skCMOff }
     },
 
     // COLOR PATTERN 3
     {
         // foreground modes
-        { &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed },
+        { &skCMOff, &skCMRed, &skCMBrightRedOrange, &skCMGreen, &skCMRainbow },
         // background modes
-        { &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff }
+        { &skCMBoot, &skCMGreenBreathe, &skCMGreenBreathe, &skCMOff, &skCMOff }
     },
 
     // COLOR PATTERN 4
     {
         // foreground modes
-        { &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed },
+        { &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed },
         // background modes
-        { &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff }
+        { &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff }
     },
 
     // COLOR PATTERN 5
     {
         // foreground modes
-        { &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed },
+        { &skCMRed, &skCMRed, &skCMRed, &skCMGreen, &skCMRed },
         // background modes
-        { &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff }
+        { &skCMOff, &skCMRedGreenBreathe, &skCMRedGreenBreathe, &skCMOff, &skCMOff }
     },
 
     // COLOR PATTERN 6
     {
         // foreground modes
-        { &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed },
+        { &skCMRed, &skCMRed, &skCMRed, &skCMBlue, &skCMRed },
         // background modes
-        { &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff }
+        { &skCMOff, &skCMRedGreenPulse, &skCMRedGreenPulse, &skCMOff, &skCMOff }
     },
 
     // COLOR PATTERN 7
     {
         // foreground modes
-        { &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed },
+        { &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed },
         // background modes
-        { &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff }
+        { &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff }
     },
 
     // COLOR PATTERN 8
     {
         // foreground modes
-        { &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed },
+        { &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed },
         // background modes
-        { &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff }
+        { &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff }
     },
 
     // COLOR PATTERN 9
     {
         // foreground modes
-        { &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed },
+        { &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed },
         // background modes
-        { &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff }
+        { &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff }
     },
 
     // COLOR PATTERN 10
     {
         // foreground modes
-        { &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed },
+        { &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed },
         // background modes
-        { &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff }
+        { &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff }
     },
 
     // COLOR PATTERN 11
     {
         // foreground modes
-        { &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed },
+        { &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed },
         // background modes
-        { &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff }
+        { &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff }
     },
 
     // COLOR PATTERN 12
     {
         // foreground modes
-        { &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed },
+        { &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed },
         // background modes
-        { &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff }
+        { &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff }
     },
 
     // COLOR PATTERN 13
     {
         // foreground modes
-        { &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed },
+        { &skCMBlue, &skCMBlue, &skCMBlue, &skCMBlue, &skCMBlue },
         // background modes
-        { &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff }
+        { &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff }
     },
 
     // COLOR PATTERN 14
     {
         // foreground modes
-        { &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed },
+        { &skCMGreen, &skCMGreen, &skCMGreen, &skCMGreen, &skCMGreen },
         // background modes
-        { &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff }
+        { &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff }
     },
 
     // COLOR PATTERN 15
     {
         // foreground modes
-        { &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed },
+        { &skCMRedOrig, &skCMRedOrig, &skCMRedOrig, &skCMRedOrig, &skCMRedOrig },
         // background modes
-        { &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff }
-    }
+        { &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff }
+    },
 };

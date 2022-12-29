@@ -116,7 +116,7 @@ void updateLEDState(uint16_t newState)
         }
         else
         {
-            mode = SM_ATTACK1;
+            mode = SM_ATTACK;
         }
     }
 
@@ -174,10 +174,10 @@ void getColor(uint8_t pos, uint8_t agStep, uint8_t *r, uint8_t *g, uint8_t *b)
             LED_MODE_VALUES_t *mv = &sFGModeValues[pos];
 
             // randomly add sparkles when shaken
-            if (sShakerState && ((rand() % 4) == 0))
+            if (sShakerState && ((rand() % 3) == 0))
             {
-                mv->currH = ((uint8_t)rand() << 4);
-                mv->currV = 255*VSCALE;
+                mv->currH = (((uint8_t)rand()) << 4);
+                mv->currV = (255*VSCALE);
             }
 
             hsv2rgb((mv->currH>>4), 255, (mv->currV>>4), r, g, b);
