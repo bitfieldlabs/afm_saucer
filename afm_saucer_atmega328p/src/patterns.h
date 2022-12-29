@@ -454,10 +454,12 @@ static const COLOR_PATTERNS_t skColorPatterns[NUM_COLOR_PATTERN] =
         { &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff }
     },
 
+    // ****************** NO BACKGROUND PATTERNS *********************
+
     // COLOR PATTERN 10
     {
         // foreground modes
-        { &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed },
+        { &skCMRainbow, &skCMRainbow, &skCMRainbow, &skCMRainbow, &skCMRainbow },
         // background modes
         { &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff }
     },
@@ -465,7 +467,7 @@ static const COLOR_PATTERNS_t skColorPatterns[NUM_COLOR_PATTERN] =
     // COLOR PATTERN 11
     {
         // foreground modes
-        { &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed },
+        { &skCMRed, &skCMRed, &skCMGreen, &skCMRainbow, &skCMRed },
         // background modes
         { &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff }
     },
@@ -473,7 +475,7 @@ static const COLOR_PATTERNS_t skColorPatterns[NUM_COLOR_PATTERN] =
     // COLOR PATTERN 12
     {
         // foreground modes
-        { &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed },
+        { &skCMRed, &skCMRed, &skCMGreen, &skCMBlue, &skCMRed },
         // background modes
         { &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff }
     },
