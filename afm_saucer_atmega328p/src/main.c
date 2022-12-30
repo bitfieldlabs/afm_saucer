@@ -34,7 +34,9 @@
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <avr/eeprom.h>
 #include <util/delay.h>
+#include <stdlib.h>
 #include <stdbool.h>
 #include "modes.h"
 
@@ -67,6 +69,11 @@ int main(void)
     PCICR |= (1 << PCIE2);                  // enable pin interrupt
     PCMSK2 |= (1 << PCINT23);               // pin change interrupt on PD7 (PCINT23)
     sei();                                  // enable interrupts
+
+    // seed the random number generator
+    uint32_t seed = eeprom_read_dword((uint32_t*)0);
+    srand(seed);
+    eeprom_write_dword((uint32_t*)0, rand());
 
     // to infinity and beyond
     while (true)

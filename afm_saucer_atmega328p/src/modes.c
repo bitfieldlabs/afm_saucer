@@ -67,7 +67,8 @@ static LED_MODE_VALUES_t sBGModeValues[NUM_LEDS];        // current background m
 static uint8_t sLEDActive[NUM_LEDS] = { 0 };   // LED active status (afterglow counter)
 static uint8_t sBGAnimCount = 0;               // background animation countdown
 static uint8_t sCfg = 0;                       // pattern configuration id
-static uint32_t sFrameCnt = 0;                  // frame counter
+static uint8_t sCfgSel = 0;                    // selected pattern configuration id
+static uint32_t sFrameCnt = 0;                 // frame counter
 
 
 //------------------------------------------------------------------------------
@@ -84,7 +85,6 @@ void updateLEDState(uint16_t newState)
     // initialize the modes
     if (sMode >= SM_NUM)
     {
-        srand(ADC);
         setMode(SM_BOOT);
     }
 
@@ -333,7 +333,7 @@ void updateLEDs()
         {
             // LED on
             //sendPixel(0xff, 0xff, 0xff, false);
-            sendPixel(144, 255, 170, false);
+            sendPixel(100, 255, 100, false);
         }
     }
     if (sFlashState)
@@ -378,11 +378,21 @@ void initValues(const LED_MODE_t *ledMode, LED_MODE_VALUES_t *ledModeValues)
 //------------------------------------------------------------------------------
 void setMode(SAUCER_MODES_t mode)
 {
+    // Configuration 0 selects a random pattern from 1-15
+    if (sCfg == 0)
+    {
+        sCfgSel = ((rand() % 14) + 1);
+    }
+    else
+    {
+        sCfgSel = sCfg;
+    }
+
     // set the mode parameters
     if ((sCfg < NUM_COLOR_PATTERN) && (mode < SM_NUM))
     {
-        sFGMode = *(skColorPatterns[sCfg].fgLEDModes[mode]);
-        sBGMode = *(skColorPatterns[sCfg].bgLEDModes[mode]);
+        sFGMode = *(skColorPatterns[sCfgSel].fgLEDModes[mode]);
+        sBGMode = *(skColorPatterns[sCfgSel].bgLEDModes[mode]);
 
         // apply mode to all LED values
         initValues(&sFGMode, &sFGModeValues[0]);
