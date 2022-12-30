@@ -162,15 +162,15 @@ static const LED_MODE_t skCMBlue =
 
 static const LED_MODE_t skCMRedOrig =
 {
-    .startH = 1*VSCALE,
-    .endH = 1*VSCALE,
+    .startH = 0*VSCALE,
+    .endH = 0*VSCALE,
     .startV = 255*VSCALE,
     .endV = 255*VSCALE,
     .speedH = 0,
     .speedV = 0,
     .ofsH = 0,
     .ofsV = 0,
-    .afterglow = 0,
+    .afterglow = 1,
     .animSpeed = 0,
     .blinkInt = 0,
     .animDir = false
@@ -268,6 +268,22 @@ static const LED_MODE_t skCMGreenBreathe =
     .ofsV = 0,
     .afterglow = 4,
     .animSpeed = 0,
+    .blinkInt = 0,
+    .animDir = false
+};
+
+static const LED_MODE_t skCMYellowGreenBreathe =
+{
+    .startH = 50*VSCALE,
+    .endH = 58*VSCALE,
+    .startV = 0*VSCALE,
+    .endV = 24*VSCALE,
+    .speedH = 1,
+    .speedV = 1,
+    .ofsH = 2,
+    .ofsV = 2,
+    .afterglow = 4,
+    .animSpeed = 8,
     .blinkInt = 0,
     .animDir = false
 };
@@ -433,9 +449,9 @@ static const COLOR_PATTERNS_t skColorPatterns[NUM_COLOR_PATTERN] =
     // COLOR PATTERN 7
     {
         // foreground modes
-        { &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed },
+        { &skCMRed, &skCMRed, &skCMRed, &skCMBlue, &skCMRed },
         // background modes
-        { &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff }
+        { &skCMOff, &skCMYellowGreenBreathe, &skCMYellowGreenBreathe, &skCMOff, &skCMOff }
     },
 
     // COLOR PATTERN 8

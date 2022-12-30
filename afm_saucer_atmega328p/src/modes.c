@@ -333,7 +333,7 @@ void updateLEDs()
         {
             // LED on
             //sendPixel(0xff, 0xff, 0xff, false);
-            sendPixel(174, 255, 171, false);
+            sendPixel(144, 255, 170, false);
         }
     }
     if (sFlashState)
