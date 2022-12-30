@@ -75,6 +75,7 @@ typedef struct COLOR_PATTERNS_s
 typedef struct LED_MODE_VALUES_s
 {
     uint16_t currH;     // current hue*VSCALE for first LED
+    uint16_t currShakerH;     // current hue*VSCALE for first LED when shaking
     uint16_t currV;     // current value*VSCALE for first LED
     int16_t currSpeedH; // current hue speed (signed)
     int16_t currSpeedV; // current value speed (signed)

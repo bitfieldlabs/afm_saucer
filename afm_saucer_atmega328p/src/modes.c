@@ -173,14 +173,19 @@ void getColor(uint8_t pos, uint8_t agStep, uint8_t *r, uint8_t *g, uint8_t *b)
             // full foreground color
             LED_MODE_VALUES_t *mv = &sFGModeValues[pos];
 
-            // randomly add sparkles when shaken
-            if (sShakerState && ((rand() % 3) == 0))
+            // randomly add sparkles when shaken (expect original configuration 15)
+            if ((sShakerState && ((rand() % 8) == 0)) && (sCfg != 15))
             {
-                mv->currH = (((uint8_t)rand()) << 4);
+                mv->currShakerH = (((uint8_t)rand()) << 4);
                 mv->currV = (255*VSCALE);
             }
+            else if (sShakerState == 0)
+            {
+                mv->currShakerH = 0;
+            }
 
-            hsv2rgb((mv->currH>>4), 255, (mv->currV>>4), r, g, b);
+            uint8_t h = (mv->currShakerH > 0) ? (mv->currShakerH>>4) : (mv->currH>>4);
+            hsv2rgb(h, 255, (mv->currV>>4), r, g, b);
         }
         else
         {
@@ -365,6 +370,7 @@ void initValues(const LED_MODE_t *ledMode, LED_MODE_VALUES_t *ledModeValues)
     uint16_t v = ledMode->startV;
     for (uint8_t i=0; i<NUM_LEDS; i++)
     {
+        ledModeValues->currShakerH = 0;
         ledModeValues->currH = h;
         ledModeValues->currSpeedH = ((ofsH < 0) == (ledMode->ofsH < 0)) ? ledMode->speedH : -ledMode->speedH;
         nextValue(&h, &ofsH, ledMode->startH, ledMode->endH);
