@@ -69,6 +69,7 @@ static uint8_t sBGAnimCount = 0;               // background animation countdown
 static uint8_t sCfg = 0;                       // pattern configuration id
 static uint8_t sCfgSel = 0;                    // selected pattern configuration id
 static uint32_t sFrameCnt = 0;                 // frame counter
+static uint16_t sBootupJingleCountdown = 200;           // bootup jingle countdown
 
 
 //------------------------------------------------------------------------------
@@ -144,9 +145,17 @@ void updateLEDState(uint16_t newState)
     }
 
     // switch mode if indicated
-    if (newMode != sMode)
+    if (sBootupJingleCountdown == 0)
     {
-        setMode(newMode);
+        if (newMode != sMode)
+        {
+            setMode(newMode);
+        }
+    }
+    else
+    {
+        // do the jingle first
+        sBootupJingleCountdown--;
     }
 }
 
