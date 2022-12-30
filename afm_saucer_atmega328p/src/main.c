@@ -50,7 +50,7 @@
 //------------------------------------------------------------------------------
 // global variables
 
-static volatile uint16_t svLEDState = 0xaaaa;    // status for all 16 LEDs
+static volatile uint16_t svLEDState = 0xffff;    // status for all 16 LEDs
 static volatile bool svFlashState = false;       // flasher status
 static volatile bool svShakerState = false;      // shaker status
 
