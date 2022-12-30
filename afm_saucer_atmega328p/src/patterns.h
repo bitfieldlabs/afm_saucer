@@ -385,6 +385,22 @@ static const LED_MODE_t skCMBrightLightBlue =
     .animDir = false
 };
 
+static const LED_MODE_t skCMAlternate =
+{
+    .startH = 2*VSCALE,
+    .endH = 72*VSCALE,
+    .startV = 04*VSCALE,
+    .endV = 44*VSCALE,
+    .speedH = 0,
+    .speedV = 4,
+    .ofsH = 72*VSCALE,
+    .ofsV = 0*VSCALE,
+    .afterglow = 4,
+    .animSpeed = 10,
+    .blinkInt = 0,
+    .animDir = false
+};
+
 // Definition of all color patterns
 #define NUM_COLOR_PATTERN 16
 static const COLOR_PATTERNS_t skColorPatterns[NUM_COLOR_PATTERN] =
@@ -438,7 +454,7 @@ static const COLOR_PATTERNS_t skColorPatterns[NUM_COLOR_PATTERN] =
     // COLOR PATTERN 5
     {
         // foreground modes
-        { &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed },
+        { &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRainbow },
         // background modes
         { &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff }
     },
@@ -446,7 +462,7 @@ static const COLOR_PATTERNS_t skColorPatterns[NUM_COLOR_PATTERN] =
     // COLOR PATTERN 6
     {
         // foreground modes
-        { &skCMRed, &skCMRed, &skCMRed, &skCMGreen, &skCMRed },
+        { &skCMRed, &skCMRed, &skCMRed, &skCMGreen, &skCMRainbow },
         // background modes
         { &skCMOff, &skCMRedGreenBreathe, &skCMRedGreenBreathe, &skCMOff, &skCMOff }
     },
@@ -454,7 +470,7 @@ static const COLOR_PATTERNS_t skColorPatterns[NUM_COLOR_PATTERN] =
     // COLOR PATTERN 7
     {
         // foreground modes
-        { &skCMRed, &skCMRed, &skCMRed, &skCMBlue, &skCMRed },
+        { &skCMRed, &skCMRed, &skCMRed, &skCMBlue, &skCMRainbow },
         // background modes
         { &skCMOff, &skCMRedGreenPulse, &skCMRedGreenPulse, &skCMOff, &skCMOff }
     },
@@ -462,7 +478,7 @@ static const COLOR_PATTERNS_t skColorPatterns[NUM_COLOR_PATTERN] =
     // COLOR PATTERN 8
     {
         // foreground modes
-        { &skCMRed, &skCMRed, &skCMRed, &skCMBlue, &skCMRed },
+        { &skCMRed, &skCMRed, &skCMRed, &skCMBlue, &skCMRainbow },
         // background modes
         { &skCMOff, &skCMYellowGreenBreathe, &skCMYellowGreenBreathe, &skCMOff, &skCMOff }
     },
@@ -470,9 +486,9 @@ static const COLOR_PATTERNS_t skColorPatterns[NUM_COLOR_PATTERN] =
     // COLOR PATTERN 9
     {
         // foreground modes
-        { &skCMRed, &skCMRed, &skCMRed, &skCMRed, &skCMRed },
+        { &skCMRed, &skCMRed, &skCMGreen, &skCMRed, &skCMRainbow },
         // background modes
-        { &skCMOff, &skCMOff, &skCMOff, &skCMOff, &skCMOff }
+        { &skCMOff, &skCMAlternate, &skCMAlternate, &skCMOff, &skCMOff }
     },
 
     // ****************** NO BACKGROUND PATTERNS *********************
