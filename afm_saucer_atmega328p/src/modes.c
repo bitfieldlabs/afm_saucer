@@ -183,7 +183,7 @@ void getColor(uint8_t pos, uint8_t agStep, uint8_t *r, uint8_t *g, uint8_t *b)
             LED_MODE_VALUES_t *mv = &sFGModeValues[pos];
 
             // randomly add sparkles when shaken (expect original configuration 15)
-            if ((sShakerState && ((rand() % 8) == 0)) && (sCfg != 15))
+            if ((sShakerState && ((rand() % 10) == 0)) && (sCfg != 15))
             {
                 mv->currShakerH = (((uint8_t)rand()) << 4);
                 mv->currV = (255*VSCALE);

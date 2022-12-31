@@ -68,12 +68,14 @@ int main(void)
     EIMSK |= (1 << INT1);                   // turn on INT1
     PCICR |= (1 << PCIE2);                  // enable pin interrupt
     PCMSK2 |= (1 << PCINT23);               // pin change interrupt on PD7 (PCINT23)
-    sei();                                  // enable interrupts
 
     // seed the random number generator
     uint32_t seed = eeprom_read_dword((uint32_t*)0);
     srand(seed);
     eeprom_write_dword((uint32_t*)0, rand());
+
+    // enable interrupts
+    sei();
 
     // to infinity and beyond
     while (true)
