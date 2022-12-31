@@ -30,3 +30,14 @@ avrdude command:
 ```
 avrdude -v -V -patmega328p -cavrisp -b19200 -P/dev/ttyUSB0 -D -F -Ulfuse:w:0xff:m -Uhfuse:w:0xda:m -Uefuse:w:0xfd:m
 ```
+
+## Configuration
+The different modes can be chosen using the four DIP switches.
+![DIP Switch](https://github.com/bitfieldlabs/afm_saucer/blob/master/doc/dip_switch.jpg)
+
+. - Switch Off
+O - Switch On
+
+| Mode | Dip Switch 4321 | Description |
+|-----:|----------------:|-------------|
+|     0| .... | Random selection of modes 1-15 at each startup |
