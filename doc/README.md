@@ -1,4 +1,5 @@
 ## Assembly instructions
+### Notes
 It's easiest to start with the smalles (lowest profile) components and work the way up to the largest ones.
 
 * *Note 1* Mind the polarity for the large capacitor C1!
@@ -9,11 +10,13 @@ It's easiest to start with the smalles (lowest profile) components and work the 
 * *Note 6* Be careful not to short any LED pins, they are quite close to each other
 * *Note 7* Switch 1 of the DIP switch SW3 points down to where SW3 is labelled
 
+### Resistor values
 The resistor values are
 * R1: 10k
 * R2, R3, R4, R5: 1k
 * R6, R7: 220
 
+### Assembly images
 ![Assembly 1](https://github.com/bitfieldlabs/afm_saucer/blob/master/doc/assembly_1.jpg)
 ![Assembly 1](https://github.com/bitfieldlabs/afm_saucer/blob/master/doc/assembly_2.jpg)
 ![Assembly 1](https://github.com/bitfieldlabs/afm_saucer/blob/master/doc/assembly_3.jpg)
