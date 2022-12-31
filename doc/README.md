@@ -2,8 +2,10 @@
 It's easiest to start with the smalles (lowest profile) components and work the way up to the largest ones.
 
 * *Note 1* Mind the polarity for the large capacitor C1!
-* *Note 2* Mind the polarity for The Atmega chip U1!
-
+* *Note 2* Mind the polarity for the Atmega chip U2!
+* *Note 3* Mind the polarity for the LEDS! The flat side (-) is marked on the PCB. It's the connection with the square solder pad. It matches the LED's long legs.
+* *Note 4* The legs of the 5V regulator (U1) must be bent straight in order to solder it flat to the PCB (see images). The VO (voltage out) pin must be connected to the upper solder pad, where U1 is marked. VI (voltage in) points toward the middle of the PCB.
+* *Note 5* Remove pin 3 of the connector J1 as it is the key pin.
 
 ![Assembly 1](https://github.com/bitfieldlabs/afm_saucer/blob/master/doc/assembly_1.jpg)
 ![Assembly 1](https://github.com/bitfieldlabs/afm_saucer/blob/master/doc/assembly_2.jpg)
