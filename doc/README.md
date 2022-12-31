@@ -39,7 +39,7 @@ The different modes can be chosen using the four DIP switches.
 
 | Mode | Dip Switch 4321 | Description |
 |-----:|----------------:|-------------|
-|     0| ....| Random selection of modes 1-15 at each startup |
+|     0| ....| Random selection of mode 1-15 at each startup |
 |     1| ...O| Teal background pulse. Red, orange and pink LEDs. |
 |     2| ..O.| Rainbow background. Red, orange and light blue LEDs. |
 |     3| ..OO| Yellow blinking background. Red, orange and light blue LEDs. |
