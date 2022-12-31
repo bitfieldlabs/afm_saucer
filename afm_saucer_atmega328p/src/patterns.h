@@ -43,7 +43,6 @@ typedef enum SAUCER_MODES_e
     SM_ATTRACT,         // attract mode, alternating blinking pattern
     SM_GAMEIDLE,        // game mode, saucer idle, all LEDs off
     SM_ATTACK,          // game mode, saucer attack
-    SM_DESTROYED,       // game mode, saucer destroyed
     SM_TEST,            // saucer test mode, on LED at a time, starting with D16
 
     SM_NUM              // number of saucer modes

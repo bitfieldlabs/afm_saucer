@@ -104,12 +104,9 @@ int main(void)
 // LED data interrupt
 ISR(INT0_vect)
 {
-    // read data from PD4
-    uint8_t data = (PIND & 0b00010000);
-
     // shift new value into LED status
     svLEDState <<= 1;
-    svLEDState |= (data >> 4);
+    *((uint8_t*)&svLEDState) |= ((PIND >> 4) & 0x01);
 }
 
 //------------------------------------------------------------------------------
