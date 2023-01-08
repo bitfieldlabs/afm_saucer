@@ -14,5 +14,5 @@ See a video of the saucer in action: https://vimeo.com/777834938
 
 The BOM is [here](https://github.com/bitfieldlabs/afm_saucer/blob/master/afm_saucer_pcb/afm_saucer/afm_saucer_bom.csv).
  
-## Instructions
+## :page_facing_up: Instructions
 Some instructions can be found in the [doc folder](https://github.com/bitfieldlabs/afm_saucer/tree/master/doc).
