@@ -9,7 +9,7 @@ As a bonus you get nice RGB colors!
 
 See a video of the saucer in action: https://vimeo.com/777834938
 
-## Required Components
+## :jigsaw: Required Components
 ![components](https://github.com/bitfieldlabs/afm_saucer/blob/master/pictures/components.jpg)
 
 The BOM is [here](https://github.com/bitfieldlabs/afm_saucer/blob/master/afm_saucer_pcb/afm_saucer/afm_saucer_bom.csv).
