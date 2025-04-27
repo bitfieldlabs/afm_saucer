@@ -45,6 +45,7 @@
 // definitions
 
 #define LED_UPDATE_INT 20                   // LED update interval [ms]
+#define FLASH_CONS_CHECK 1                  // number of consecutive flash line checks in LED_UPDATE_INT interval required for flash triggering
 
 
 //------------------------------------------------------------------------------
@@ -53,6 +54,7 @@
 static volatile uint16_t svLEDState = 0xffff;    // status for all 16 LEDs
 static volatile bool svFlashState = false;       // flasher status
 static volatile bool svShakerState = false;      // shaker status
+static volatile uint16_t svFlashCounter = 0;     // consecutive passed flash line checks counter
 
 
 //------------------------------------------------------------------------------
@@ -84,8 +86,23 @@ int main(void)
         updateLEDState(svLEDState);
         if (svFlashState)
         {
-            triggerFlasher();
-            svFlashState = false;
+            // noise filtering: make sure the flash line is still kept low for at
+            // least FLASH_CONS_CHECK consecutive checks
+            if (!(PIND & 0b00001000))
+            {
+                svFlashCounter++;
+                if (svFlashCounter >= FLASH_CONS_CHECK)
+                {
+                    triggerFlasher();
+                    svFlashCounter = 0;
+                    svFlashState = false;
+                }
+            }
+            else
+            {
+                svFlashCounter = 0;
+                svFlashState = false;
+            }
         }
         if (svShakerState)
         {
